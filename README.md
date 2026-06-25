@@ -1,243 +1,486 @@
-[![Fork Button](https://img.shields.io/github/forks/iemafzalhassan/full-stack_chatApp?style=social)](https://github.com/iemafzalhassan/full-stack_chatApp/fork)
+# 🚀 Three-Tier Chat Application on Kubernetes
 
+A full-stack real-time chat application deployed on **Kubernetes** using a complete **3-tier architecture** with:
 
-# Real-Time Chat Application
+* **Frontend**: React + Nginx
+* **Backend**: Node.js + Express
+* **Database**: MongoDB
+* **Containerization**: Docker
+* **Orchestration**: Kubernetes
+* **Networking**: Services + Ingress
+* **Storage**: PersistentVolume + PersistentVolumeClaim
+* **Secrets**: Kubernetes Secret
 
+---
 
-Welcome to the **Full Stack Realtime Chat App** project, where we're building a scalable and secure real-time chat experience using the latest technologies. Whether you're a seasoned developer or a beginner, we invite you to contribute and be a part of this exciting journey!
+## 📌 Project Overview
 
-## Table of Contents
+This project demonstrates how to deploy a production-style 3-tier web application on Kubernetes.
 
+The application is divided into three layers:
 
-* [Introduction](#introduction)
-* [Features](#features)
-* [Tech Stack](#tech-stack)
-* [Getting Started](#getting-started)
-* [Building the Backend](#building-the-backend)
-* [Running the Application](#running-the-application)
-* [Contributing](#contributing)
-* [Future Plans](#future-plans)
-* [License](#license)
+```text
+User Browser
+   ↓
+Ingress Controller
+   ↓
+Frontend Service
+   ↓
+Frontend Pod
+   ↓
+Backend Service
+   ↓
+Backend Pod
+   ↓
+MongoDB Service
+   ↓
+MongoDB Pod + Persistent Storage
+```
 
-## 📝 Introduction
+---
 
-This project aims to provide a real-time chat experience that's both scalable and secure. With a focus on modern technologies, we're building an application that's easy to use and maintain.
+## 🧱 Architecture
 
-## ✨ Features
+```text
+                    ┌────────────────────┐
+                    │    User Browser     │
+                    │  chat-aru.com       │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │  Ingress Controller │
+                    │      NGINX          │
+                    └─────────┬──────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+   ┌────────────────────┐          ┌────────────────────┐
+   │  Frontend Service  │          │  Backend Service   │
+   │      Port 80       │          │     Port 5001      │
+   └─────────┬──────────┘          └─────────┬──────────┘
+             │                               │
+             ▼                               ▼
+   ┌────────────────────┐          ┌────────────────────┐
+   │  Frontend Pod      │          │  Backend Pod       │
+   │ React + Nginx      │          │ Node.js + Express  │
+   └────────────────────┘          └─────────┬──────────┘
+                                             │
+                                             ▼
+                                  ┌────────────────────┐
+                                  │ MongoDB Service    │
+                                  │    Port 27017      │
+                                  └─────────┬──────────┘
+                                            │
+                                            ▼
+                                  ┌────────────────────┐
+                                  │ MongoDB Pod        │
+                                  │ Persistent Storage │
+                                  └────────────────────┘
+```
 
-
-* **Real-time Messaging**: Send and receive messages instantly using Socket.io 
-* **User Authentication & Authorization**: Securely manage user access with JWT 
-* **Scalable & Secure Architecture**: Built to handle large volumes of traffic and data 
-* **Modern UI Design**: A user-friendly interface crafted with React and TailwindCSS 
-* **Profile Management**: Users can upload and update their profile pictures 
-* **Online Status**: View real-time online/offline status of users 
-
+---
 
 ## 🛠️ Tech Stack
 
-
-* **Backend:** Node.js, Express, MongoDB, Socket.io
-* **Frontend:** React, TailwindCSS
-* **Containerization:** Docker
-* **Orchestration:** Kubernetes (planned)
-* **Web Server:** Nginx
-* **State Management:** Zustand
-* **Authentication:** JWT
-* **Styling Components:** DaisyUI
-
-
-### 🔧 Prerequisites
-
-
-* **[Node.js](https://nodejs.org/)** (v14 or higher)
-* **[Docker](https://www.docker.com/get-started)** (for containerizing the app)
-* **[Git](https://git-scm.com/downloads)** (to clone the repository)
-
-
-### 📝 Environment Configuration
-
-Create a `.env` file in the root directory with the following configuration:
-
-```env
-# Database Configuration
-MONGODB_URI=mongodb://root:admin@mongo:27017/chatApp?authSource=admin&retryWrites=true&w=majority
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
-
-# Server Configuration
-PORT=5001
-NODE_ENV=production
-```
-
-> **Note:** 
-> - Replace `your_jwt_secret_key` with a strong secret key
-> - For local development without Docker, change `MONGODB_URI` to `mongodb://localhost:27017/chatApp`
-> - You can use command ```echo "Text what you want" | base64
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/iemafzalhassan/full-stack_chatApp.git
-```
-
-🏗️ Build and Run the Application
-
-Follow these steps to build and run the application:
-
-1. Build & Run the Containers:
-
-```bash
-cd full-stack_chatApp
-```
-```bash
-docker-compose up -d --build
-```
-
-2. Access the application in your browser:
-
-```
-http://localhost
-```
----
-
-## 🛠️ Getting Started
-
-Follow these simple steps to get the project up and running on your local Host using docker.
-
-```bash
-git clone https://github.com/iemafzalhassan/full-stack_chatApp.git
-```
-
-```bash
-cd full-stack_chatApp
-```
-## Create a Docker network:
-
-```bash
-docker network create full-stack
-```
-
-## 🛠️ Building the Frontend
-
-```bash
-cd frontend
-```
-
-```bash
-docker build -t full-stack_frontend .
-```
-
-### Run the Frontend container:
-
-```bash
-docker run -d --network=full-stack  -p 5173:5173 --name frontend full-stack_frontend:latest
-```
-#### The frontend will now be accessible on port 5173.
-
-
-## Run the MongoDB Container:
-
-```bash
-docker run -d -p 27017:27017 --name mongo mongo:latest
-```
----
-
-## 🛠️ Building the Backend
-
-```bash
-cd backend
-```
-
-### Build the Backend image:
-
-```bash
-docker build -t full-stack_backend .
-```
-
-### Run the Backend container:
-
-```bash
-docker run -d --network=full-stack --add-host=host.docker.internal:host-gateway -p 5001:5001 --env-file .env full-stack_backend
-```
-#### This will build and run the backend container, exposing the backendAPI on port 5001.
-
-`Backend API: http://localhost:5001`
-
-### To Verify the conncetion between backend and databse:
-```bash
-docker-compose logs -f
-```
-
-### Once the backend and frontend containers are running, you can access the application in your browser:
-
-`Frontend: http://localhost`
-
-
-You can now interact with the real-time chat app and start messaging!
+| Layer            | Technology               |
+| ---------------- | ------------------------ |
+| Frontend         | React, Nginx             |
+| Backend          | Node.js, Express         |
+| Database         | MongoDB                  |
+| Containerization | Docker                   |
+| Orchestration    | Kubernetes               |
+| Local Cluster    | Minikube                 |
+| Ingress          | NGINX Ingress Controller |
+| Storage          | PV, PVC                  |
+| Secrets          | Kubernetes Secret        |
 
 ---
 
+## 📁 Project Structure
 
-
-### 🤝 Contributing
-
-
-We welcome contributions from DevOps & Developer of all skill levels! Here's how you can contribute:
-
-**Report bugs:** If you encounter any bugs or issues, please open an issue with detailed information.
-**Suggest features:** Have an idea for a new feature? Open an issue to discuss it with the community.
-**Submit pull requests:** If you have a fix or a feature you'd like to contribute, submit a pull request. Ensure your changes pass any linting or tests, if applicable.
-
-### 🌐 Join the Community
-
-We invite you to join our community of developers and contributors. Let's work together to build an amazing real-time chat application!
-
-* **Star this repository** to show your support
-* **Fork this repository** to contribute to the project
-* **Open an issue** to report bugs or suggest features
-* **Submit a pull request** to contribute code changes
-
-## 🔮 Future Plans
-
-
-This project is evolving, and here are a few exciting things on the horizon:
-
-* [ ] **CI/CD Pipelines:** Implement Continuous Integration and Continuous Deployment pipelines to automate testing and deployment.
-* [ ] **Kubernetes (K8s):** Add Kubernetes manifests for container orchestration to deploy the app on cloud platforms like AWS, GCP, or Azure.
-* [ ] **Feature Expansion:** Add more features like group chats, media sharing, and user status updates.
-* **Stay tuned for updates as we continue to improve and expand this project!**
+```text
+three-tier-app-with-k8s/
+│
+├── backend/
+│   ├── src/
+│   ├── package.json
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── src/
+│   ├── package.json
+│   └── Dockerfile
+│
+├── k8s/
+│   ├── namespace.yml
+│   ├── secret.yml
+│   ├── mongodb-pv.yml
+│   ├── mongodb-pvc.yml
+│   ├── mongodb-deployment.yml
+│   ├── mongodb-service.yml
+│   ├── backend-deployment.yml
+│   ├── backend-service.yml
+│   ├── frontend-deployment.yml
+│   ├── frontend-service.yml
+│   └── ingress.yml
+│
+├── docker-compose.yml
+├── Jenkinsfile
+└── README.md
+```
 
 ---
 
-## 📚 Project Snapshots:
+## ⚙️ Kubernetes Components Used
 
-![Settings](frontend/public/settings.png)
+### Namespace
 
-![chat](frontend/public/chat.png)
+All application resources are deployed inside the `chat-app` namespace.
 
-![logout](/frontend/public/logout.png)
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chat-app
+```
 
-![Login](/frontend/public/login.png)
+---
 
+### MongoDB Persistent Storage
 
+MongoDB uses:
 
-## 📜 License
+* `PersistentVolume`
+* `PersistentVolumeClaim`
 
+This ensures MongoDB data is stored persistently even if the MongoDB pod restarts.
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+---
 
+### Backend Deployment
 
+The backend runs as a Node.js container and connects to MongoDB using:
 
+```text
+mongodb-service:27017
+```
 
+Example MongoDB URI:
 
+```text
+mongodb://mongoadmin:secret@mongodb-service:27017/chatapp?authSource=admin
+```
 
+---
 
+### Frontend Deployment
 
+The frontend is served using Nginx and exposed internally through a Kubernetes Service.
 
+---
 
+### Ingress
 
+Ingress exposes the application using a custom local domain:
 
+```text
+chat-aru.com
+```
 
+Ingress routes:
 
+```text
+/      → frontend service
+/api   → backend service
+```
+
+---
+
+## 🚀 How to Run This Project Locally
+
+### 1. Start Minikube
+
+```bash
+minikube start
+```
+
+---
+
+### 2. Enable Ingress Controller
+
+```bash
+minikube addons enable ingress
+```
+
+Check Ingress controller:
+
+```bash
+kubectl get pods -n ingress-nginx
+```
+
+---
+
+### 3. Apply Kubernetes Manifests
+
+From the project root:
+
+```bash
+kubectl apply -f k8s/
+```
+
+---
+
+### 4. Check Pods
+
+```bash
+kubectl get pods -n chat-app
+```
+
+Expected output:
+
+```text
+NAME                                  READY   STATUS    RESTARTS   AGE
+backend-deployment-xxxxx              1/1     Running   0          1m
+frontend-deployment-xxxxx             1/1     Running   0          1m
+mongodb-deployment-xxxxx              1/1     Running   0          1m
+```
+
+---
+
+### 5. Check Services
+
+```bash
+kubectl get svc -n chat-app
+```
+
+---
+
+### 6. Check Ingress
+
+```bash
+kubectl get ingress -n chat-app
+```
+
+Expected:
+
+```text
+NAME              CLASS   HOSTS          ADDRESS        PORTS
+chatapp-ingress   nginx   chat-aru.com   192.168.x.x    80
+```
+
+---
+
+## 🌐 Access Application Using Custom Domain
+
+Add this entry in your Windows hosts file:
+
+```text
+127.0.0.1 chat-aru.com
+```
+
+Hosts file location:
+
+```text
+C:\Windows\System32\drivers\etc\hosts
+```
+
+Flush DNS:
+
+```powershell
+ipconfig /flushdns
+```
+
+Verify:
+
+```powershell
+ping chat-aru.com
+```
+
+Expected:
+
+```text
+Pinging chat-aru.com [127.0.0.1]
+```
+
+---
+
+### Port Forward Ingress Controller
+
+```bash
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 80:80
+```
+
+Now open:
+
+```text
+http://chat-aru.com
+```
+
+---
+
+## 🔐 Kubernetes Secret
+
+The project uses Kubernetes Secret for storing sensitive values.
+
+Example:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: chatapp-secret
+  namespace: chat-app
+type: Opaque
+data:
+  password: <base64-encoded-password>
+```
+
+To encode a value:
+
+```bash
+echo -n "your-password" | base64
+```
+
+---
+
+## 🧪 Useful Debugging Commands
+
+### Check pods
+
+```bash
+kubectl get pods -n chat-app
+```
+
+### Check logs
+
+```bash
+kubectl logs -n chat-app -l app=backend
+kubectl logs -n chat-app -l app=frontend
+kubectl logs -n chat-app -l app=mongodb
+```
+
+### Describe pod
+
+```bash
+kubectl describe pod <pod-name> -n chat-app
+```
+
+### Check services
+
+```bash
+kubectl get svc -n chat-app
+```
+
+### Check endpoints
+
+```bash
+kubectl get endpoints -n chat-app
+```
+
+### Check ingress
+
+```bash
+kubectl describe ingress chatapp-ingress -n chat-app
+```
+
+---
+
+## 🧠 Issues Faced and Fixed
+
+During deployment, several real-world Kubernetes issues were debugged and fixed:
+
+* Wrong YAML fields like `matchLables`, `port`, and `accessMode`
+* Namespace-related resource issues
+* Missing MongoDB PVC
+* MongoDB authentication failure
+* Backend missing environment variables
+* Wrong MongoDB service DNS
+* Frontend Nginx upstream service issue
+* Ingress host mismatch
+* Windows hosts file DNS issue
+* Port forwarding from local system to Ingress controller
+
+---
+
+## ✅ Final Working Flow
+
+```text
+chat-aru.com
+   ↓
+127.0.0.1
+   ↓
+kubectl port-forward 80:80
+   ↓
+NGINX Ingress Controller
+   ↓
+chatapp-ingress
+   ↓
+Frontend Service
+   ↓
+Frontend Pod
+   ↓
+Backend Service
+   ↓
+Backend Pod
+   ↓
+MongoDB Service
+   ↓
+MongoDB Pod
+   ↓
+Persistent Volume
+```
+
+---
+
+## 🧹 Cleanup
+
+To delete all resources:
+
+```bash
+kubectl delete namespace chat-app
+```
+
+To disable Minikube ingress:
+
+```bash
+minikube addons disable ingress
+```
+
+To stop Minikube:
+
+```bash
+minikube stop
+```
+
+---
+
+## 📌 Key Learning
+
+This project helped me understand how a real-world application is deployed on Kubernetes using:
+
+* Deployments
+* Services
+* Namespaces
+* Secrets
+* Persistent Volumes
+* Persistent Volume Claims
+* Ingress
+* Local DNS mapping
+* Debugging pod crashes
+* Service discovery inside Kubernetes
+
+---
+
+## 👨‍💻 Author
+
+**Arpit Kumar Prajapati**
+
+* GitHub: [ARPITPRAJAPATI](https://github.com/ARPITPRAJAPATI)
+* Project: Three-Tier Chat Application with Kubernetes
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
